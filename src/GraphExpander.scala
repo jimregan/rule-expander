@@ -1,6 +1,8 @@
 import java.io.IOException
+import scala.util.matching.Regex
 
 sealed abstract class Treeish
+case class DummyNonTerminal(lemma: String, tags: String) extends Treeish
 case class TLNonTerminal(lemma: String, tags: String, pos: Array[Int]) extends Treeish
 case class TLTerminal(chunk: String, pos:Int) extends Treeish
 case class NonTerminal(lemma: String, tags: String, align: List[TLNonTerminal]) extends Treeish
@@ -27,7 +29,7 @@ object GraphExpander {
   /**
     * Generates a map of alignments, left to right
     *
-    * @param String space separated list of hyphen separated alignments
+    * @param al space separated list of hyphen separated alignments
     */
   def splitAlignmentsLR(al: String) = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(0), i(1))
@@ -39,12 +41,22 @@ object GraphExpander {
   /**
     * Generates a map of alignments, right to left
     *
-    * @param String space separated list of hyphen separated alignments
+    * @param al space separated list of hyphen separated alignments
     */
   def splitAlignmentsRL(al: String) = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(1), i(0))
     val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
+  }
+
+  def makeNT(s: String): DummyNonTerminal =  {
+    val withLemma = new Regex("""\"([^"]*)\"<([^>]*)>""")
+    val tagsOnly = new Regex("""([a-z][a-z0-9\.]*[a-z0-9])""")
+    s match {
+      case withLemma(lem, tag) => DummyNonTerminal(lem, tag)
+      case tagsOnly(tag) => DummyNonTerminal("", tag)
+      case _ => DummyNonTerminal("", "")
+    }
   }
 }
