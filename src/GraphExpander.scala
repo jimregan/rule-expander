@@ -5,7 +5,7 @@ sealed abstract class Treeish
 case class DummyNonTerminal(lemma: String, tags: String) extends Treeish
 case class TLNonTerminal(lemma: String, tags: Array[String], pos: Array[Int]) extends Treeish
 case class TLTerminal(chunk: String, pos:Int) extends Treeish
-case class NonTerminal(lemma: String, tags: Array[String], align: List[TLNonTerminal]) extends Treeish
+case class NonTerminal(lemma: String, tags: Array[String], align: Array[TLNonTerminal]) extends Treeish
 case class Terminal(chunk: String, align: TLTerminal) extends Treeish
 
 
@@ -67,8 +67,20 @@ object GraphExpander {
     * @param m map of SL alignments
     * @return
     */
-  def dummyNTtoTL(s: String, pos: Int, m: Map[Int,Array[Int]]): TLNonTerminal = {
+  def dummyNTtoTL(s: String, pos: Int, m: Map[Int, Array[Int]]): TLNonTerminal = {
     val dummy = makeNT(s)
     TLNonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos+1, Array[Int]()))
+  }
+
+  /**
+    * Make an SL side token
+    * @param s string of the SL side token
+    * @param pos position of token
+    * @param m map of TL tokens
+    * @return
+    */
+  def dummyNTtoSL(s: String, pos: Int, m: Map[Int, Array[TLNonTerminal]]): NonTerminal = {
+    val dummy = makeNT(s)
+    NonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos+1, Array[TLNonTerminal]()))
   }
 }
