@@ -27,11 +27,11 @@ class GraphExpander {
 
 object GraphExpander {
   /**
-    * Generates a map of alignments, left to right
+    * Generates a map of alignments, source side
     *
     * @param al space separated list of hyphen separated alignments
     */
-  def splitAlignmentsLR(al: String) = {
+  def splitAlignmentsSL(al: String) = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(0), i(1))
     val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
@@ -39,11 +39,11 @@ object GraphExpander {
   }
 
   /**
-    * Generates a map of alignments, right to left
+    * Generates a map of alignments, translation side
     *
     * @param al space separated list of hyphen separated alignments
     */
-  def splitAlignmentsRL(al: String) = {
+  def splitAlignmentsTL(al: String) = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(1), i(0))
     val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
@@ -60,8 +60,15 @@ object GraphExpander {
     }
   }
 
-  def dummyNTtoRL(s: String, pos: Int, m: Map[Int,Array[Int]]): TLNonTerminal = {
+  /**
+    * Make a TL side token
+    * @param s string of the TL side token
+    * @param pos position of token
+    * @param m map of SL alignments
+    * @return
+    */
+  def dummyNTtoTL(s: String, pos: Int, m: Map[Int,Array[Int]]): TLNonTerminal = {
     val dummy = makeNT(s)
-    TLNonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos, Array[Int]()))
+    TLNonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos+1, Array[Int]()))
   }
 }
