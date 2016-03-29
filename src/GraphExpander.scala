@@ -3,9 +3,9 @@ import scala.util.matching.Regex
 
 sealed abstract class Treeish
 case class DummyNonTerminal(lemma: String, tags: String) extends Treeish
-case class TLNonTerminal(lemma: String, tags: String, pos: Array[Int]) extends Treeish
+case class TLNonTerminal(lemma: String, tags: Array[String], pos: Array[Int]) extends Treeish
 case class TLTerminal(chunk: String, pos:Int) extends Treeish
-case class NonTerminal(lemma: String, tags: String, align: List[TLNonTerminal]) extends Treeish
+case class NonTerminal(lemma: String, tags: Array[String], align: List[TLNonTerminal]) extends Treeish
 case class Terminal(chunk: String, align: TLTerminal) extends Treeish
 
 
@@ -58,5 +58,10 @@ object GraphExpander {
       case tagsOnly(tag) => DummyNonTerminal("", tag)
       case _ => DummyNonTerminal("", "")
     }
+  }
+
+  def dummyNTtoRL(s: String, pos: Int, m: Map[Int,Array[Int]]): TLNonTerminal = {
+    val dummy = makeNT(s)
+    TLNonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos, Array[Int]()))
   }
 }
