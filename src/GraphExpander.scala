@@ -1,10 +1,10 @@
 import java.io.IOException
 
 sealed abstract class Treeish
-case class TLNonTerminal(lemma: String, tags: String, pos: List[Int]) extends Treeish
+case class TLNonTerminal(lemma: String, tags: String, pos: Array[Int]) extends Treeish
 case class TLTerminal(chunk: String, pos:Int) extends Treeish
 case class NonTerminal(lemma: String, tags: String, align: List[TLNonTerminal]) extends Treeish
-case class Terminal(chunk: String, align: List[TLTerminal]) extends Treeish
+case class Terminal(chunk: String, align: TLTerminal) extends Treeish
 
 
 class GraphExpander {
