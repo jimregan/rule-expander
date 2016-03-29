@@ -31,7 +31,7 @@ object GraphExpander {
     */
   def splitAlignmentsLR(al: String) = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(0), i(1))
-    val als = al.split(" ").map{_.split("_").map(_.toInt)}.map{toTuple}
+    val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
   }
@@ -43,7 +43,7 @@ object GraphExpander {
     */
   def splitAlignmentsRL(al: String) = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(1), i(0))
-    val als = al.split(" ").map{_.split("_").map(_.toInt)}.map{toTuple}
+    val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
   }
