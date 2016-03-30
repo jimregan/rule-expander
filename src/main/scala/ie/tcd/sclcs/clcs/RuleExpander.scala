@@ -23,8 +23,6 @@
  */
 package ie.tcd.sclcs.clcs
 
-import java.io.IOException
-
 import scala.collection.immutable.TreeMap
 import scala.util.matching.Regex
 
