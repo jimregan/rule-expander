@@ -1,8 +1,11 @@
 import java.io.IOException
+
+import scala.collection.immutable.TreeMap
 import scala.util.matching.Regex
 
 sealed abstract class Treeish
 case class DummyNonTerminal(lemma: String, tags: String) extends Treeish
+case class DummyTerminal(chunk: String) extends Treeish
 case class TLNonTerminal(lemma: String, tags: Array[String], pos: Array[Int]) extends Treeish
 case class TLTerminal(chunk: String, pos:Int) extends Treeish
 case class NonTerminal(lemma: String, tags: Array[String], align: Array[TLNonTerminal]) extends Treeish
@@ -10,7 +13,7 @@ case class Terminal(chunk: String, align: TLTerminal) extends Treeish
 
 
 class GraphExpander {
-  //val cache = collection.mutable.Map[String, List[Treeish]]
+  val cache = new collection.mutable.HashMap[String, List[Treeish]]()
 
   def addToCache(s: String, last: String, lineNumber: Int) = {
     val first = s.split(" = ")
@@ -58,6 +61,25 @@ object GraphExpander {
       case tagsOnly(tag) => DummyNonTerminal("", tag)
       case _ => DummyNonTerminal("", "")
     }
+  }
+
+  /**
+    * FIXME: Needs to also return terminals
+    * @see dummyNTtoSL
+    * @param a Array of TL tokens
+    * @param m map of target-to-source alignment positions
+    * @return map of target positions to source tokens tokens
+    */
+  def populateTLMap(a: Array[TLNonTerminal], m: Map[Int,Array[Int]]): Map[Int, Array[TLNonTerminal]] = {
+    val msort = TreeMap(m.toSeq:_*)
+    val mlast = msort.lastKey
+    if (a.size != mlast) {
+      System.err.println("Error: mismatching alignments")
+    }
+    def mkTLArray(ant: Array[TLNonTerminal], anum: Array[Int]): Array[TLNonTerminal] = {
+      anum.map{i => ant(i - 1)}
+    }
+    a.zipWithIndex.map{x => (x._2, mkTLArray(a, m.get(x._2).get))}.toMap
   }
 
   /**
