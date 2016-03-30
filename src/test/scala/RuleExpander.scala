@@ -1,4 +1,5 @@
 import org.scalatest._
+import RuleExpander._
 
 class RuleExpander extends FlatSpec with Matchers {
   "splitAlignmentsSL" should "generate a map of alignments" in {
