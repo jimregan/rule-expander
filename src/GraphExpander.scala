@@ -8,9 +8,11 @@ case class DummyNonTerminal(lemma: String, tags: String) extends Treeish
 case class DummyTerminal(chunk: String) extends Treeish
 case class TLNonTerminal(lemma: String, tags: Array[String], pos: Array[Int]) extends Treeish
 case class TLTerminal(chunk: String, pos:Int) extends Treeish
-case class NonTerminal(lemma: String, tags: Array[String], align: Array[TLNonTerminal]) extends Treeish
-case class Terminal(chunk: String, align: TLTerminal) extends Treeish
+case class SLNonTerminal(lemma: String, tags: Array[String], align: Array[TLNonTerminal]) extends Treeish
+case class SLTerminal(chunk: String, align: TLTerminal) extends Treeish
 
+class CastException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+class AlignmentException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
 class GraphExpander {
   val cache = new collection.mutable.HashMap[String, List[Treeish]]()
@@ -75,7 +77,7 @@ object GraphExpander {
     val msort = TreeMap(m.toSeq:_*)
     val mlast = msort.lastKey
     if (a.size != mlast) {
-      System.err.println("Error: mismatching alignments")
+      throw new AlignmentException("Alignment mismatch")
     }
     def mkTLArray(ant: Array[Treeish], anum: Array[Int]): Array[Treeish] = {
       anum.map{i => ant(i - 1)}
@@ -99,8 +101,7 @@ object GraphExpander {
         if(psn.size == 1) {
           TLTerminal(a, psn(0))
         } else {
-          System.err.println("Unaligned terminal!!!")
-          TLTerminal(a, 0)
+          throw new AlignmentException("Unaligned Terminal")
         }
       }
     }
@@ -113,22 +114,31 @@ object GraphExpander {
     * @param m map of TL tokens
     * @return
     */
-  /*
   def dummyNTtoSL(s: String, pos: Int, m: Map[Int, Array[Treeish]]): Treeish = {
     val dummy = makeToken(s)
-    NonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos+1, Array[TLNonTerminal]()))
+    def castTLTerminal(t: Treeish): TLTerminal = {
+      t match {
+        case tl: TLTerminal => tl
+        case _ => throw new CastException("Expected TLTerminal")
+      }
+    }
+    def castTLNonTerminal(t: Treeish): TLNonTerminal = {
+      t match {
+        case tl: TLNonTerminal => tl
+        case _ => throw new CastException("Expected TLNonTerminal")
+      }
+    }
+    def castTLNonTerminalArray(a: Array[Treeish]): Array[TLNonTerminal] = a.map{castTLNonTerminal}
     dummy match {
-      case DummyNonTerminal(a, b) => TLNonTerminal(a, b.split("\\."), m.get(pos+1).get)
+      case DummyNonTerminal(a, b) => SLNonTerminal(a, b.split("\\."), castTLNonTerminalArray(m.get(pos+1).get))
       case DummyTerminal(a) => {
         val psn = m.get(pos+1).get
         if(psn.size == 1) {
-          TLTerminal(a, psn(0))
+          SLTerminal(a, castTLTerminal(psn(0)))
         } else {
-          System.err.println("Unaligned terminal!!!")
-          TLTerminal(a, 0)
+          throw new AlignmentException("Unaligned Terminal")
         }
       }
     }
   }
-  */
 }
