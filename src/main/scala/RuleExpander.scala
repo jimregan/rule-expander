@@ -14,7 +14,7 @@ case class SLTerminal(chunk: String, align: TLTerminal) extends Treeish
 class CastException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 class AlignmentException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
-class GraphExpander {
+class RuleExpander {
   val cache = new collection.mutable.HashMap[String, List[Treeish]]()
 
   def addToCache(s: String, last: String, lineNumber: Int) = {
@@ -30,7 +30,7 @@ class GraphExpander {
   }
 }
 
-object GraphExpander {
+object RuleExpander {
   /**
     * Generates a map of alignments, source side
     *
