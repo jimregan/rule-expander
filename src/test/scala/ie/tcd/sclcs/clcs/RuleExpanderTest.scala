@@ -21,10 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import org.scalatest._
-import RuleExpander._
+package ie.tcd.sclcs.clcs
 
-class RuleExpander extends FlatSpec with Matchers {
+import org.scalatest._
+
+class RuleExpanderTest extends FlatSpec with Matchers {
   "splitAlignmentsSL" should "generate a map of alignments" in {
     val al1 = "1-1 1-2"
     val al1out = RuleExpander.splitAlignmentsSL(al1)
