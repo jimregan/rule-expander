@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package ie.tcd.sclcs.clcs
+
 import java.io.IOException
 
 import scala.collection.immutable.TreeMap
