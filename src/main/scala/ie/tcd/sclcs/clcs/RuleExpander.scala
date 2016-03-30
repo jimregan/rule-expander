@@ -39,6 +39,7 @@ case class SLTerminal(chunk: String, align: TLTerminal) extends Treeish
 class CastException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 class AlignmentException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 class ArgumentException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+class ParseException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
 class RuleExpander {
   val cache = new collection.mutable.HashMap[String, List[Treeish]]()
@@ -48,10 +49,10 @@ class RuleExpander {
     val chunkLabel = if (first(0).matches("^\\s*$")) last else first(0).trim
     val second = first(1).split(" \\| ")
     if (first.size != 2 || second.size != 3) {
-      throw new IOException("Incorrect number of fields at line " + lineNumber + ": " + s)
+      throw new ParseException("Incorrect number of fields at line " + lineNumber + ": " + s)
     }
     if (chunkLabel.eq("")) {
-      throw new IOException("Chunk label missing at line " + lineNumber + ": " + s)
+      throw new ParseException("Chunk label missing at line " + lineNumber + ": " + s)
     }
   }
 }
