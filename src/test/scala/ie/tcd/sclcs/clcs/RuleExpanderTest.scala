@@ -25,11 +25,12 @@ package ie.tcd.sclcs.clcs
 
 import org.scalatest._
 
-class RuleExpanderTest extends FlatSpec with Matchers {
+class RuleExpanderTest extends FlatSpec {
   "splitAlignmentsSL" should "generate a map of alignments" in {
     val al1 = "1-1 1-2"
     val al1out = RuleExpander.splitAlignmentsSL(al1)
     val al1exp = Map(1 -> Array(1, 2))
-    al1out should equal (al1exp)
+    val al1bool = al1out.equals(al1exp)
+    assert(al1bool)
   }
 }
