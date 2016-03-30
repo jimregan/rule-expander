@@ -64,19 +64,18 @@ object GraphExpander {
   }
 
   /**
-    * FIXME: Needs to also return terminals
     * @see dummyNTtoSL
     * @param a Array of TL tokens
     * @param m map of target-to-source alignment positions
     * @return map of target positions to source tokens tokens
     */
-  def populateTLMap(a: Array[TLNonTerminal], m: Map[Int,Array[Int]]): Map[Int, Array[TLNonTerminal]] = {
+  def populateTLMap(a: Array[Treeish], m: Map[Int,Array[Int]]): Map[Int, Array[Treeish]] = {
     val msort = TreeMap(m.toSeq:_*)
     val mlast = msort.lastKey
     if (a.size != mlast) {
       System.err.println("Error: mismatching alignments")
     }
-    def mkTLArray(ant: Array[TLNonTerminal], anum: Array[Int]): Array[TLNonTerminal] = {
+    def mkTLArray(ant: Array[Treeish], anum: Array[Int]): Array[Treeish] = {
       anum.map{i => ant(i - 1)}
     }
     a.zipWithIndex.map{x => (x._2, mkTLArray(a, m.get(x._2).get))}.toMap
