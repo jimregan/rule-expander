@@ -38,6 +38,7 @@ case class SLTerminal(chunk: String, align: TLTerminal) extends Treeish
 
 class CastException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 class AlignmentException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+class ArgumentException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
 class RuleExpander {
   val cache = new collection.mutable.HashMap[String, List[Treeish]]()
@@ -129,6 +130,7 @@ object RuleExpander {
           throw new AlignmentException("Unaligned Terminal")
         }
       }
+      case _ => throw new ArgumentException("Invalid argument")
     }
   }
 
@@ -164,6 +166,7 @@ object RuleExpander {
           throw new AlignmentException("Unaligned Terminal")
         }
       }
+      case _ => throw new ArgumentException("Invalid argument")
     }
   }
 }
