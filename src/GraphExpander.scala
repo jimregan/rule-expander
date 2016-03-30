@@ -53,12 +53,14 @@ object GraphExpander {
     almap
   }
 
-  def makeNT(s: String): DummyNonTerminal =  {
+  def makeToken(s: String): Treeish =  {
     val withLemma = new Regex("""\"([^"]*)\"<([^>]*)>""")
     val tagsOnly = new Regex("""([a-z][a-z0-9\.]*[a-z0-9])""")
+    val nonTerminal = new Regex("""([A-Z][A-Z0-9]*[A-Z0-9])""")
     s match {
       case withLemma(lem, tag) => DummyNonTerminal(lem, tag)
       case tagsOnly(tag) => DummyNonTerminal("", tag)
+      case nonTerminal(tag) => DummyTerminal(tag)
       case _ => DummyNonTerminal("", "")
     }
   }
@@ -88,9 +90,20 @@ object GraphExpander {
     * @param m map of SL alignments
     * @return
     */
-  def dummyNTtoTL(s: String, pos: Int, m: Map[Int, Array[Int]]): TLNonTerminal = {
-    val dummy = makeNT(s)
-    TLNonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos+1, Array[Int]()))
+  def dummyNTtoTL(s: String, pos: Int, m: Map[Int, Array[Int]]): Treeish = {
+    val dummy = makeToken(s)
+    dummy match {
+      case DummyNonTerminal(a, b) => TLNonTerminal(a, b.split("\\."), m.get(pos+1).get)
+      case DummyTerminal(a) => {
+        val psn = m.get(pos+1).get
+        if(psn.size == 1) {
+          TLTerminal(a, psn(0))
+        } else {
+          System.err.println("Unaligned terminal!!!")
+          TLTerminal(a, 0)
+        }
+      }
+    }
   }
 
   /**
@@ -100,8 +113,22 @@ object GraphExpander {
     * @param m map of TL tokens
     * @return
     */
-  def dummyNTtoSL(s: String, pos: Int, m: Map[Int, Array[TLNonTerminal]]): NonTerminal = {
-    val dummy = makeNT(s)
+  /*
+  def dummyNTtoSL(s: String, pos: Int, m: Map[Int, Array[Treeish]]): Treeish = {
+    val dummy = makeToken(s)
     NonTerminal(dummy.lemma, dummy.tags.split("\\."), m.getOrElse(pos+1, Array[TLNonTerminal]()))
+    dummy match {
+      case DummyNonTerminal(a, b) => TLNonTerminal(a, b.split("\\."), m.get(pos+1).get)
+      case DummyTerminal(a) => {
+        val psn = m.get(pos+1).get
+        if(psn.size == 1) {
+          TLTerminal(a, psn(0))
+        } else {
+          System.err.println("Unaligned terminal!!!")
+          TLTerminal(a, 0)
+        }
+      }
+    }
   }
+  */
 }
