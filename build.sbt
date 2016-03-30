@@ -1,4 +1,4 @@
-name := "grexpsbt"
+name := "RuleExpander"
 
 version := "1.0"
 
