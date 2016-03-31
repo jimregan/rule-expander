@@ -120,9 +120,9 @@ object RuleExpander {
   def dummyNTtoTL(s: String, pos: Int, m: Map[Int, Array[Int]]): Treeish = {
     val dummy = makeToken(s)
     dummy match {
-      case DummyNonTerminal(a, b) => TLNonTerminal(a, b.split("\\."), m.get(pos+1).get)
+      case DummyNonTerminal(a, b) => TLNonTerminal(a, b.split("\\."), m.get(pos).get)
       case DummyTerminal(a) => {
-        val psn = m.get(pos+1).get
+        val psn = m.get(pos).get
         if(psn.size == 1) {
           TLTerminal(a, psn(0))
         } else {
@@ -133,6 +133,18 @@ object RuleExpander {
     }
   }
 
+  def castTLTerminal(t: Treeish): TLTerminal = {
+    t match {
+      case tl: TLTerminal => tl
+      case _ => throw new CastException("Expected TLTerminal")
+    }
+  }
+  def castTLNonTerminal(t: Treeish): TLNonTerminal = {
+    t match {
+      case tl: TLNonTerminal => tl
+      case _ => throw new CastException("Expected TLNonTerminal")
+    }
+  }
   /**
     * Make an SL side token
     * @param s string of the SL side token
@@ -142,18 +154,6 @@ object RuleExpander {
     */
   def dummyNTtoSL(s: String, pos: Int, m: Map[Int, Array[Treeish]]): Treeish = {
     val dummy = makeToken(s)
-    def castTLTerminal(t: Treeish): TLTerminal = {
-      t match {
-        case tl: TLTerminal => tl
-        case _ => throw new CastException("Expected TLTerminal")
-      }
-    }
-    def castTLNonTerminal(t: Treeish): TLNonTerminal = {
-      t match {
-        case tl: TLNonTerminal => tl
-        case _ => throw new CastException("Expected TLNonTerminal")
-      }
-    }
     def castTLNonTerminalArray(a: Array[Treeish]): Array[TLNonTerminal] = a.map{castTLNonTerminal}
     dummy match {
       case DummyNonTerminal(a, b) => SLNonTerminal(a, b.split("\\."), castTLNonTerminalArray(m.get(pos+1).get))
