@@ -145,6 +145,18 @@ object RuleExpander {
       case _ => throw new CastException("Expected TLNonTerminal")
     }
   }
+  def castSLTerminal(t: Treeish): SLTerminal = {
+    t match {
+      case tl: SLTerminal => tl
+      case _ => throw new CastException("Expected SLTerminal")
+    }
+  }
+  def castSLNonTerminal(t: Treeish): SLNonTerminal = {
+    t match {
+      case tl: SLNonTerminal => tl
+      case _ => throw new CastException("Expected SLNonTerminal")
+    }
+  }
   /**
     * Make an SL side token
     * @param s string of the SL side token
