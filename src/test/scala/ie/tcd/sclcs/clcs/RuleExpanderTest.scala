@@ -74,4 +74,15 @@ class RuleExpanderTest extends FlatSpec with Matchers {
     assert(cast_result.pos === Array(1, 2))
     assert(cast_result.lemma === "")
   }
+
+  "dummyNTtoSL" should "generate an SL token from a dummy token" in {
+    val result = RuleExpander.dummyNTtoSL("foo.bar", 1, Map(1 -> Array(TLNonTerminal("", Array("bat", "baz"), Array(1)))))
+    result shouldBe a [SLNonTerminal]
+    val cast_result = RuleExpander.castSLNonTerminal(result)
+    assert(cast_result.tags === Array("foo", "bar"))
+    assert(cast_result.lemma === "")
+    val cast_res =  RuleExpander.castTLNonTerminal(cast_result.align(0))
+    assert(cast_res.tags === Array("bat", "baz"))
+    assert(cast_res.pos === Array(1))
+  }
 }
