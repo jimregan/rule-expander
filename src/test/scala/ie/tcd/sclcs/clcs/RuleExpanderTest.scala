@@ -47,4 +47,10 @@ class RuleExpanderTest extends FlatSpec with Matchers {
     assert (al2out.get(1).get === Array(1))
     assert (al2out.get(2).get === Array(2, 3))
   }
+
+  "makeToken" should "generate a token" in {
+    assert(RuleExpander.makeToken("\"foo\"<bar>") === DummyNonTerminal("foo", "bar"))
+    assert(RuleExpander.makeToken("bar") === DummyNonTerminal("", "bar"))
+    assert(RuleExpander.makeToken("FOO") === DummyTerminal("FOO"))
+  }
 }
