@@ -85,4 +85,15 @@ class RuleExpanderTest extends FlatSpec with Matchers {
     assert(cast_res.tags === Array("bat", "baz"))
     assert(cast_res.pos === Array(1))
   }
+
+  "populateTLMap" should "fill an array of TL tokens based on alignments" in {
+    def mycast(t: TLNonTerminal): Treeish = t
+    val tlar = Array(mycast(TLNonTerminal("", Array("foo"), Array(1))), mycast(TLNonTerminal("", Array("bat", "baz"), Array(1))))
+    val res = RuleExpander.populateTLMap(tlar, Map(1 -> Array(1, 2)))
+    val first = res.get(1).get
+    val firsta = RuleExpander.castTLNonTerminal(first(0))
+    val firstb = RuleExpander.castTLNonTerminal(first(1))
+    assert(firsta.tags === Array("foo"))
+    assert(firstb.tags === Array("bat", "baz"))
+  }
 }
