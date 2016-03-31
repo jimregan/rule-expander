@@ -102,7 +102,7 @@ object RuleExpander {
     val msort = TreeMap(m.toSeq:_*)
     val mlast = msort.lastKey
     if (a.size != mlast) {
-      throw new AlignmentException("Alignment mismatch")
+      throw new AlignmentException("Alignment mismatch: " + a.size + " vs " + mlast)
     }
     def mkTLArray(ant: Array[Treeish], anum: Array[Int]): Array[Treeish] = {
       anum.map{i => ant(i - 1)}
