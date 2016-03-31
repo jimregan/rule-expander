@@ -99,15 +99,25 @@ object RuleExpander {
     * @return map of target positions to source tokens tokens
     */
   def populateTLMap(a: Array[Treeish], m: Map[Int,Array[Int]]): Map[Int, Array[Treeish]] = {
-    val msort = TreeMap(m.toSeq:_*)
-    val mlast = msort.lastKey
+    def highest_val(i: Iterable[Array[Int]]): Int = {
+      i.toSeq.map(_.toSeq).flatten.reduceLeft(_ max _)
+    }
+    val mlast = highest_val(m.values)
     if (a.size != mlast) {
       throw new AlignmentException("Alignment mismatch: " + a.size + " vs " + mlast)
     }
+    // fuck fuck fuck fuck fuck fuck fuck fuck fuck
     def mkTLArray(ant: Array[Treeish], anum: Array[Int]): Array[Treeish] = {
-      anum.map{i => ant(i - 1)}
+      anum.map{i => ant(i-1)}
     }
-    a.zipWithIndex.map{x => (x._2, mkTLArray(a, m.get(x._2).get))}.toMap
+    def tmphlp (a: Array[Treeish], m: Map[Int,Array[Int]], pos: Int): Array[Treeish] = {
+      System.err.println ("tmphlp: " + pos)
+      val made = mkTLArray(a, m.get(pos+1).get)
+      System.err.println ("made: " + made.size)
+    }
+    System.err.println("m.get " + m.get(1).get(0) + " " + m.get(1).get(1))
+    //a.zipWithIndex.map{x => (x._2+1, mkTLArray(a, m.get(x._2+1).get))}.toMap
+    a.zipWithIndex.map{x => (x._2+1, tmphlp(a, m, x._2) ) }.toMap
   }
 
   /**
