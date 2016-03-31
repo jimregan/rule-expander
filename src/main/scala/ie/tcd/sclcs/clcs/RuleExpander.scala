@@ -156,9 +156,9 @@ object RuleExpander {
     val dummy = makeToken(s)
     def castTLNonTerminalArray(a: Array[Treeish]): Array[TLNonTerminal] = a.map{castTLNonTerminal}
     dummy match {
-      case DummyNonTerminal(a, b) => SLNonTerminal(a, b.split("\\."), castTLNonTerminalArray(m.get(pos+1).get))
+      case DummyNonTerminal(a, b) => SLNonTerminal(a, b.split("\\."), castTLNonTerminalArray(m.get(pos).get))
       case DummyTerminal(a) => {
-        val psn = m.get(pos+1).get
+        val psn = m.get(pos).get
         if(psn.size == 1) {
           SLTerminal(a, castTLTerminal(psn(0)))
         } else {
