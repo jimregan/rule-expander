@@ -54,6 +54,18 @@ class RuleExpanderTest extends FlatSpec with Matchers {
     assert(RuleExpander.makeToken("FOO") === DummyTerminal("FOO"))
   }
 
+  "castTLNonTerminal" should "return a TLNonTerminal" in {
+    val casted = RuleExpander.castTLNonTerminal(TLNonTerminal("", Array("foo"), Array(1)))
+    casted shouldBe a [TLNonTerminal]
+    a [CastException] should be thrownBy RuleExpander.castTLNonTerminal(TLTerminal("FOO", 1))
+  }
+
+  "castTLTerminal" should "return a TLTerminal" in {
+    val casted = RuleExpander.castTLTerminal(TLTerminal("FOO", 1))
+    casted shouldBe a [TLTerminal]
+    a [CastException] should be thrownBy RuleExpander.castTLTerminal(TLNonTerminal("", Array("foo"), Array(1)))
+  }
+
   "dummyNTtoTL" should "generate a TL token from a dummy token" in {
     val result = RuleExpander.dummyNTtoTL("foo.bar", 1, Map(1 -> Array(1, 2)))
     result shouldBe a [TLNonTerminal]
