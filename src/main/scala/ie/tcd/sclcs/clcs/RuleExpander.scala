@@ -106,18 +106,10 @@ object RuleExpander {
     if (a.size != mlast) {
       throw new AlignmentException("Alignment mismatch: " + a.size + " vs " + mlast)
     }
-    // fuck fuck fuck fuck fuck fuck fuck fuck fuck
     def mkTLArray(ant: Array[Treeish], anum: Array[Int]): Array[Treeish] = {
       anum.map{i => ant(i-1)}
     }
-    def tmphlp (a: Array[Treeish], m: Map[Int,Array[Int]], pos: Int): Array[Treeish] = {
-      System.err.println ("tmphlp: " + pos)
-      val made = mkTLArray(a, m.get(pos+1).get)
-      System.err.println ("made: " + made.size)
-    }
-    System.err.println("m.get " + m.get(1).get(0) + " " + m.get(1).get(1))
-    //a.zipWithIndex.map{x => (x._2+1, mkTLArray(a, m.get(x._2+1).get))}.toMap
-    a.zipWithIndex.map{x => (x._2+1, tmphlp(a, m, x._2) ) }.toMap
+    m.map{x => (x._1, mkTLArray(a, x._2))}
   }
 
   /**
