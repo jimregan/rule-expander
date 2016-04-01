@@ -52,6 +52,10 @@ class RuleExpander {
     if (chunkLabel.eq("")) {
       throw new ParseException("Chunk label missing at line " + lineNumber + ": " + s)
     }
+    val SLDTokens = second(0).split(" ").map{RuleExpander.makeToken}
+    val TLDTokens = second(1).split(" ").map{RuleExpander.makeToken}
+    val SLAlign = second(2).split(" ").map{RuleExpander.splitAlignmentsSL}
+    val TLAlign = second(2).split(" ").map{RuleExpander.splitAlignmentsTL}
   }
 }
 
