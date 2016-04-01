@@ -56,7 +56,10 @@ class RuleExpander {
     val TLDTokens = second(1).split(" ")
     val SLAlign = RuleExpander.splitAlignmentsSL(second(2))
     val TLAlign = RuleExpander.splitAlignmentsTL(second(2))
-    val TLTokens = TLDTokens.zipWithIndex.map{x => RuleExpander.dummyNTtoTL(x._1, x._2+1, TLAlign)}
+    val TLTokens: Array[Treeish] = TLDTokens.zipWithIndex.map{x => RuleExpander.dummyNTtoTL(x._1, x._2+1, TLAlign)}
+    val TLMap = RuleExpander.populateTLMap(TLTokens, TLAlign)
+    val SLTokens: Array[Treeish] = SLDTokens.zipWithIndex.map{x => RuleExpander.dummyNTtoSL(x._1, x._2+1, TLMap)}
+    cache(chunkLabel) ::= SLTokens.toList
 
     chunkLabel // to use in next call
   }
