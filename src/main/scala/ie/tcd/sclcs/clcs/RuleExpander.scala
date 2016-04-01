@@ -40,7 +40,7 @@ class ArgumentException(message: String = null, cause: Throwable = null) extends
 class ParseException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
 class RuleExpander {
-  val cache = new collection.mutable.HashMap[String, List[Treeish]]()
+  val cache = new collection.mutable.HashMap[String, List[Treeish]].withDefaultValue(Nil)
 
   def addToCache(s: String, last: String, lineNumber: Int) = {
     val first = s.split(" = ")
