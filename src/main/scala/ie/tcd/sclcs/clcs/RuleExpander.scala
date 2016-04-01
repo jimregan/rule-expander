@@ -42,7 +42,7 @@ class ParseException(message: String = null, cause: Throwable = null) extends Ru
 class RuleExpander {
   val cache = new collection.mutable.HashMap[String, List[Treeish]].withDefaultValue(Nil)
 
-  def addToCache(s: String, last: String, lineNumber: Int) = {
+  def addToCache(s: String, last: String, lineNumber: Int): String = {
     val first = s.split(" = ")
     val chunkLabel = if (first(0).matches("^\\s*$")) last else first(0).trim
     val second = first(1).split(" \\| ")
@@ -52,10 +52,13 @@ class RuleExpander {
     if (chunkLabel.eq("")) {
       throw new ParseException("Chunk label missing at line " + lineNumber + ": " + s)
     }
-    val SLDTokens = second(0).split(" ").map{RuleExpander.makeToken}
-    val TLDTokens = second(1).split(" ").map{RuleExpander.makeToken}
-    val SLAlign = second(2).split(" ").map{RuleExpander.splitAlignmentsSL}
-    val TLAlign = second(2).split(" ").map{RuleExpander.splitAlignmentsTL}
+    val SLDTokens = second(0).split(" ")
+    val TLDTokens = second(1).split(" ")
+    val SLAlign = RuleExpander.splitAlignmentsSL(second(2))
+    val TLAlign = RuleExpander.splitAlignmentsTL(second(2))
+    val TLTokens = TLDTokens.zipWithIndex.map{x => RuleExpander.dummyNTtoTL(x._1, x._2+1, TLAlign)}
+
+    chunkLabel // to use in next call
   }
 }
 
@@ -65,7 +68,7 @@ object RuleExpander {
     *
     * @param al space separated list of hyphen separated alignments
     */
-  def splitAlignmentsSL(al: String) = {
+  def splitAlignmentsSL(al: String): Map[Int,Array[Int]] = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(0), i(1))
     val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
@@ -77,7 +80,7 @@ object RuleExpander {
     *
     * @param al space separated list of hyphen separated alignments
     */
-  def splitAlignmentsTL(al: String) = {
+  def splitAlignmentsTL(al: String): Map[Int,Array[Int]] = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(1), i(0))
     val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
