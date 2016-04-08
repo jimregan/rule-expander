@@ -96,4 +96,11 @@ class RuleExpanderTest extends FlatSpec with Matchers {
     assert(firsta.tags === Array("foo"))
     assert(firstb.tags === Array("bat", "baz"))
   }
+
+  "TLNonTerminalToATTString" should "create an apertium-transfer-tools string from a TLNonTerminal" in {
+    var out = RuleExpander.TLNonTerminalToATTString(TLNonTerminal((""), Array("n", "sg"), Array(1)))
+    assert(out == "^<n><sg>$")
+    out = RuleExpander.TLNonTerminalToATTString(TLNonTerminal(("foo"), Array("n", "sg"), Array(1)))
+    assert(out == "^foo<n><sg>$")
+  }
 }
