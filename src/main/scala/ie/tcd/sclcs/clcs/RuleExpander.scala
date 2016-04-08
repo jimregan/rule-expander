@@ -40,7 +40,7 @@ class ArgumentException(message: String = null, cause: Throwable = null) extends
 class ParseException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
 class RuleExpander {
-  val cache = new collection.mutable.HashMap[String, List[Treeish]].withDefaultValue(Nil)
+  val cache = new collection.mutable.HashMap[String, Set[Array[Treeish]]] with collection.mutable.MultiMap[String, Array[Treeish]]
 
   def addToCache(s: String, last: String, lineNumber: Int): String = {
     val first = s.split(" = ")
@@ -59,7 +59,7 @@ class RuleExpander {
     val TLTokens: Array[Treeish] = TLDTokens.zipWithIndex.map { x => RuleExpander.dummyNTtoTL(x._1, x._2 + 1, TLAlign) }
     val TLMap = RuleExpander.populateTLMap(TLTokens, TLAlign)
     val SLTokens: Array[Treeish] = SLDTokens.zipWithIndex.map { x => RuleExpander.dummyNTtoSL(x._1, x._2 + 1, TLMap) }
-    //cache(chunkLabel) ::= SLTokens.toList
+    cache.addBinding(chunkLabel, SLTokens)
 
     chunkLabel // to use in next call
   }
