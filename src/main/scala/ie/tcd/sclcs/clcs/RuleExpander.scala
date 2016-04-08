@@ -59,7 +59,7 @@ class RuleExpander {
     val TLTokens: Array[Treeish] = TLDTokens.zipWithIndex.map { x => RuleExpander.dummyNTtoTL(x._1, x._2 + 1, TLAlign) }
     val TLMap = RuleExpander.populateTLMap(TLTokens, TLAlign)
     val SLTokens: Array[Treeish] = SLDTokens.zipWithIndex.map { x => RuleExpander.dummyNTtoSL(x._1, x._2 + 1, TLMap) }
-    cache(chunkLabel) ::= SLTokens.toList
+    //cache(chunkLabel) ::= SLTokens.toList
 
     chunkLabel // to use in next call
   }
@@ -73,11 +73,7 @@ object RuleExpander {
     */
   def splitAlignmentsSL(al: String): Map[Int, Array[Int]] = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(0), i(1))
-    val als = al.split(" ").map {
-      _.split("-").map(_.toInt)
-    }.map {
-      toTuple
-    }
+    val als = al.split(" ").map {_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
   }
@@ -89,11 +85,7 @@ object RuleExpander {
     */
   def splitAlignmentsTL(al: String): Map[Int, Array[Int]] = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(1), i(0))
-    val als = al.split(" ").map {
-      _.split("-").map(_.toInt)
-    }.map {
-      toTuple
-    }
+    val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
   }
