@@ -56,9 +56,9 @@ class RuleExpander {
     val TLDTokens = second(1).split(" ")
     val SLAlign = RuleExpander.splitAlignmentsSL(second(2))
     val TLAlign = RuleExpander.splitAlignmentsTL(second(2))
-    val TLTokens: Array[Treeish] = TLDTokens.zipWithIndex.map{x => RuleExpander.dummyNTtoTL(x._1, x._2+1, TLAlign)}
+    val TLTokens: Array[Treeish] = TLDTokens.zipWithIndex.map { x => RuleExpander.dummyNTtoTL(x._1, x._2 + 1, TLAlign) }
     val TLMap = RuleExpander.populateTLMap(TLTokens, TLAlign)
-    val SLTokens: Array[Treeish] = SLDTokens.zipWithIndex.map{x => RuleExpander.dummyNTtoSL(x._1, x._2+1, TLMap)}
+    val SLTokens: Array[Treeish] = SLDTokens.zipWithIndex.map { x => RuleExpander.dummyNTtoSL(x._1, x._2 + 1, TLMap) }
     cache(chunkLabel) ::= SLTokens.toList
 
     chunkLabel // to use in next call
@@ -71,9 +71,13 @@ object RuleExpander {
     *
     * @param al space separated list of hyphen separated alignments
     */
-  def splitAlignmentsSL(al: String): Map[Int,Array[Int]] = {
+  def splitAlignmentsSL(al: String): Map[Int, Array[Int]] = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(0), i(1))
-    val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
+    val als = al.split(" ").map {
+      _.split("-").map(_.toInt)
+    }.map {
+      toTuple
+    }
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
   }
@@ -83,14 +87,18 @@ object RuleExpander {
     *
     * @param al space separated list of hyphen separated alignments
     */
-  def splitAlignmentsTL(al: String): Map[Int,Array[Int]] = {
+  def splitAlignmentsTL(al: String): Map[Int, Array[Int]] = {
     def toTuple(i: Array[Int]): (Int, Int) = (i(1), i(0))
-    val als = al.split(" ").map{_.split("-").map(_.toInt)}.map{toTuple}
+    val als = al.split(" ").map {
+      _.split("-").map(_.toInt)
+    }.map {
+      toTuple
+    }
     val almap = als.groupBy(_._1).map { case (k, v) => (k, v.map(_._2)) }
     almap
   }
 
-  def makeToken(s: String): Treeish =  {
+  def makeToken(s: String): Treeish = {
     val withLemma = new Regex("""\"([^"]*)\"<([^>]*)>""")
     val tagsOnly = new Regex("""([a-z][a-z0-9\.]*[a-z0-9])""")
     val nonTerminal = new Regex("""([A-Z][A-Z0-9]*[A-Z0-9])""")
@@ -108,7 +116,7 @@ object RuleExpander {
     * @param m map of target-to-source alignment positions
     * @return map of target positions to source tokens tokens
     */
-  def populateTLMap(a: Array[Treeish], m: Map[Int,Array[Int]]): Map[Int, Array[Treeish]] = {
+  def populateTLMap(a: Array[Treeish], m: Map[Int, Array[Int]]): Map[Int, Array[Treeish]] = {
     def highest_val(i: Iterable[Array[Int]]): Int = {
       i.toSeq.map(_.toSeq).flatten.reduceLeft(_ max _)
     }
@@ -117,16 +125,17 @@ object RuleExpander {
       throw new AlignmentException("Alignment mismatch: " + a.size + " vs " + mlast)
     }
     def mkTLArray(ant: Array[Treeish], anum: Array[Int]): Array[Treeish] = {
-      anum.map{i => ant(i-1)}
+      anum.map { i => ant(i - 1) }
     }
-    m.map{x => (x._1, mkTLArray(a, x._2))}
+    m.map { x => (x._1, mkTLArray(a, x._2)) }
   }
 
   /**
     * Make a TL side token
-    * @param s string of the TL side token
+    *
+    * @param s   string of the TL side token
     * @param pos position of token
-    * @param m map of SL alignments
+    * @param m   map of SL alignments
     * @return
     */
   def dummyNTtoTL(s: String, pos: Int, m: Map[Int, Array[Int]]): Treeish = {
@@ -135,7 +144,7 @@ object RuleExpander {
       case DummyNonTerminal(a, b) => TLNonTerminal(a, b.split("\\."), m.get(pos).get)
       case DummyTerminal(a) => {
         val psn = m.get(pos).get
-        if(psn.size == 1) {
+        if (psn.size == 1) {
           TLTerminal(a, psn(0))
         } else {
           throw new AlignmentException("Unaligned Terminal")
@@ -151,39 +160,46 @@ object RuleExpander {
       case _ => throw new CastException("Expected TLTerminal")
     }
   }
+
   def castTLNonTerminal(t: Treeish): TLNonTerminal = {
     t match {
       case tl: TLNonTerminal => tl
       case _ => throw new CastException("Expected TLNonTerminal")
     }
   }
+
   def castSLTerminal(t: Treeish): SLTerminal = {
     t match {
       case tl: SLTerminal => tl
       case _ => throw new CastException("Expected SLTerminal")
     }
   }
+
   def castSLNonTerminal(t: Treeish): SLNonTerminal = {
     t match {
       case tl: SLNonTerminal => tl
       case _ => throw new CastException("Expected SLNonTerminal")
     }
   }
+
   /**
     * Make an SL side token
-    * @param s string of the SL side token
+    *
+    * @param s   string of the SL side token
     * @param pos position of token
-    * @param m map of TL tokens
+    * @param m   map of TL tokens
     * @return
     */
   def dummyNTtoSL(s: String, pos: Int, m: Map[Int, Array[Treeish]]): Treeish = {
     val dummy = makeToken(s)
-    def castTLNonTerminalArray(a: Array[Treeish]): Array[TLNonTerminal] = a.map{castTLNonTerminal}
+    def castTLNonTerminalArray(a: Array[Treeish]): Array[TLNonTerminal] = a.map {
+      castTLNonTerminal
+    }
     dummy match {
       case DummyNonTerminal(a, b) => SLNonTerminal(a, b.split("\\."), castTLNonTerminalArray(m.get(pos).get))
       case DummyTerminal(a) => {
         val psn = m.get(pos).get
-        if(psn.size == 1) {
+        if (psn.size == 1) {
           SLTerminal(a, castTLTerminal(psn(0)))
         } else {
           throw new AlignmentException("Unaligned Terminal")
@@ -191,5 +207,34 @@ object RuleExpander {
       }
       case _ => throw new ArgumentException("Invalid argument")
     }
+  }
+
+  def TLNonTerminalToATTString(t: TLNonTerminal): String = {
+    var out: String = ""
+    if (t.tags.size > 0) {
+      out = "^" + t.lemma + "<"
+      out += t.tags.mkString("><")
+      out += ">$"
+    }
+    out
+  }
+  def TLNonTerminalToRetratosString(t: TLNonTerminal): String = {
+    var out = TLNonTerminalToATTString(t)
+    if (out != "") {
+      out += ":" + t.pos
+    }
+    out
+  }
+  def TLTokenToATTString(t: Treeish): String = {
+    var out: String = ""
+    t match {
+      case SLTerminal(a, t) => {
+        out = t.chunk + ":" + t.pos.toString
+      }
+      case SLNonTerminal(s, t, a) => {
+        val str = a.map(TLNonTerminalToATTString)
+      }
+    }
+    out
   }
 }
