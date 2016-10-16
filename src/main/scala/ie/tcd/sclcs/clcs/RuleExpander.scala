@@ -233,4 +233,12 @@ object RuleExpander {
     }
     out
   }
+  def incSLTerminal(s: SLTerminal, i: Int): SLTerminal = {
+    SLTerminal(s.chunk, TLTerminal(s.align.chunk, s.align.pos + i))
+  }
+  def incSLNonTerminal(s: SLNonTerminal, i: Int): SLNonTerminal = {
+    SLNonTerminal(s.lemma, s.tags, s.align.map{
+      x => TLNonTerminal(x.lemma, x.tags, x.pos.map{a => a + i})
+    })
+  }
 }
