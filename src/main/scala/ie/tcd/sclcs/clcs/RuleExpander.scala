@@ -233,9 +233,19 @@ object RuleExpander {
     }
     out
   }
+  /**
+   * Increment the positions of the TLTerminal contained
+   * in the SLTerminal (taken from the position of an expanded
+   * TLTerminal)
+   */
   def incSLTerminal(s: SLTerminal, i: Int): SLTerminal = {
     SLTerminal(s.chunk, TLTerminal(s.align.chunk, s.align.pos + i))
   }
+  /**
+   * Increment the positions of the TLNonTerminal contained
+   * in the SLNonTerminal (taken from the position of an expanded
+   * TLTerminal)
+   */
   def incSLNonTerminal(s: SLNonTerminal, i: Int): SLNonTerminal = {
     SLNonTerminal(s.lemma, s.tags, s.align.map{
       x => TLNonTerminal(x.lemma, x.tags, x.pos.map{a => a + i})
